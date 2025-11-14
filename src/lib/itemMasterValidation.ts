@@ -501,12 +501,16 @@ export async function validateItemMaster(
 ): Promise<ValidationResult> {
   const workbook = new ExcelJS.Workbook();
   
-  // Convert Buffer to ArrayBuffer if needed
-  const buffer = workbookBuffer instanceof Buffer
-    ? workbookBuffer.buffer.slice(workbookBuffer.byteOffset, workbookBuffer.byteOffset + workbookBuffer.byteLength)
-    : workbookBuffer;
+  // ExcelJS.load accepts Buffer or ArrayBuffer, but TypeScript types are strict
+  // Convert ArrayBuffer to Buffer if needed
+  let buffer: Buffer;
+  if (workbookBuffer instanceof Buffer) {
+    buffer = workbookBuffer;
+  } else {
+    buffer = Buffer.from(new Uint8Array(workbookBuffer)) as Buffer;
+  }
   
-  await workbook.xlsx.load(buffer);
+  await workbook.xlsx.load(buffer as any);
   
   // Read sheets
   const itmentSheet = workbook.getWorksheet('ITMENT');

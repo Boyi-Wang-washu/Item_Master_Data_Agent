@@ -7,10 +7,18 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get("file");
 
-    // Validate file exists and is a File/Blob
-    if (!file || !(file instanceof File || file instanceof Blob)) {
+    // Validate file exists and is a File
+    if (!file) {
       return NextResponse.json(
         { error: "File is required" },
+        { status: 400 }
+      );
+    }
+
+    // Type guard: ensure it's a File (not a string)
+    if (!(file instanceof File)) {
+      return NextResponse.json(
+        { error: "Invalid file format" },
         { status: 400 }
       );
     }
