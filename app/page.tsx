@@ -23,6 +23,7 @@ function SeverityBadge({ severity }: { severity: IssueSeverity }) {
 
 export default function Page() {
   const router = useRouter();
+  const [isChecking, setIsChecking] = useState(true);
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<ValidationResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -38,6 +39,8 @@ export default function Page() {
     const authed = sessionStorage.getItem("curium-demo-authed");
     if (!authed) {
       router.replace("/login");
+    } else {
+      setIsChecking(false);
     }
   }, [router]);
 
@@ -133,6 +136,11 @@ export default function Page() {
   };
 
   const issuesToShow = result ? result.issues.slice(0, 200) : [];
+
+  // Don't render content until auth check is complete
+  if (isChecking) {
+    return null;
+  }
 
   return (
     <div className="space-y-8 md:space-y-10">
